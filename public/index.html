@@ -9,7 +9,7 @@
 	<script type="text/javascript" src="angular-cookies.js"></script>
 	
 	<script type="text/javascript">
-		var app = angular.module('mittens',['ngRoute']);
+		var app = angular.module('mittens',['ngRoute','ngCookies']);
 //hyhcfhy
 app.config(function($routeProvider, $locationProvider) {
 	$routeProvider
@@ -23,7 +23,7 @@ app.config(function($routeProvider, $locationProvider) {
 });   
   });
 
-		app.controller('HomeController', function($scope,$http){
+		app.controller('HomeController', function($scope,$http, $cookies){
 
 			$scope.submitNewMeow=function(){
 				$http.post('/meows',{newMeow : $scope.newMeow}).then(function(){
@@ -36,7 +36,18 @@ app.config(function($routeProvider, $locationProvider) {
 				$http.put('/meows/remove',{ meow: meow}).then(function(){
 				getMeows();
 			});
-			};
+		};
+		
+		$scope.signin=function(){
+$http.put('/users/signin',{ username: $scope.username,password: $scope.password})
+.then(function(res){
+	$cookies.put('token',res.data.token);
+	$scope.currentUser=$scope.username;
+	alert('successfully signed in');
+}, function(err){
+	alert('Bad login credentials');
+});
+};
 
 			function getMeows(){
 		$http.get('/meows').then(function(responce){
@@ -50,7 +61,16 @@ getMeows();
 	
 
 app.controller('SignupController', function($scope,$http){
-	
+
+	$scope.submitSignup=function(){
+var newUser= {
+	username: $scope.username,
+	password: $scope.password
+};		$http.post('/users',newUser).then(function(){
+				alert('Success');
+			});
+	};	
+		
 	console.log('You are on the Signup Page');
 });
 	</script>
